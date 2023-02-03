@@ -1,3 +1,3 @@
-import os
-
-os.mkdir("test")
+a = "abcs sdkfjsdlak asdjfklsdajl \
+skdlfskdjf dsjfkdsl"
+print(a)
