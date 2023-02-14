@@ -1,3 +1,6 @@
-a = "abcs sdkfjsdlak asdjfklsdajl \
-skdlfskdjf dsjfkdsl"
-print(a)
+import json
+test = {
+    'abc': 'bbc',
+    'bbc': 'bds'
+}
+print(json.dumps(test))
