@@ -5,8 +5,7 @@ import os
 import time
 import pymongo
 
-    
-openai.api_key = "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"
+openai.api_key = "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"
 OPENAI_GPT_MODEL = "text-davinci-003" 
 
 mongo_cli = pymongo.MongoClient("localhost", 27017)
@@ -43,6 +42,8 @@ def parse_product(category, item_id, item_title, item_specifies):
     )
     gpt_title = response.choices[0]['text']
     gpt_content_dict['short_title'] = gpt_title.strip()
+    print(response.choices)
+    print(response.usage)
     
     # 2.generate long product title in English
     print("...#2.generate long product title in English")
@@ -59,6 +60,8 @@ def parse_product(category, item_id, item_title, item_specifies):
     )
     gpt_title = response.choices[0]['text']
     gpt_content_dict['long_title'] = gpt_title.strip()
+    print(response.choices)
+    print(response.usage)
 
     
     print ("the original title : %s"%item_title)
@@ -78,6 +81,8 @@ def parse_product(category, item_id, item_title, item_specifies):
       frequency_penalty=0.0,
       presence_penalty=0.0)
     gpt_content_dict['item_specifies'] = response.choices[0]['text']
+    print(response.choices)
+    print(response.usage)
     
     
     # 4. select import tags 
@@ -95,6 +100,8 @@ def parse_product(category, item_id, item_title, item_specifies):
       presence_penalty=0.0
     )
     gpt_content_dict['selected_tags'] = response.choices[0]['text']
+    print(response.choices)
+    print(response.usage)
 
 
     # 5. generate recommend essay
@@ -112,6 +119,8 @@ def parse_product(category, item_id, item_title, item_specifies):
       presence_penalty=0.0
     )
     gpt_content_dict['recommend_essay'] = response.choices[0]['text']
+    print(response.choices)
+    print(response.usage)
 
     return gpt_content_dict
 
@@ -151,8 +160,8 @@ with open("1688_product_2023021.json", "r") as file_in:
                     "clothes", 
                     product_json['itemId'], 
                     product_json['itemName'],
-                    product_json['itemSpecifics'],
-#                    item_specific_dict
+#                    product_json['itemSpecifics'],
+                    item_specific_dict
                 )
                 store_data_in_mongodb(product_json, gpt_content_dict)
                 c_success += 1
@@ -161,6 +170,7 @@ with open("1688_product_2023021.json", "r") as file_in:
         except Exception as e:
             c_error += 1
             print("error....%s"%e)
+        print("%d items processed: %d exist, %d success, %d error."%(c_all, c_exit, c_success, c_error))
 file_in.close()
 
 print("%d items process: %d exist, %d success, %d error."%(c_all, c_exit, c_success, c_error))
