@@ -5,12 +5,12 @@ import os
 import time
 import pymongo
 
-openai.api_key = "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"
+openai.api_key = "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"
 OPENAI_GPT_MODEL = "text-davinci-003" 
 
 mongo_cli = pymongo.MongoClient("localhost", 27017)
 product_db = mongo_cli['1688_product_test']
-product_table = product_db['gpt_product_info']
+product_table = product_db['gpt_product_info_beam']
 product_table.create_index([('item_id', pymongo.ASCENDING)], unique=True)
 
 
@@ -146,11 +146,11 @@ c_all = 0
 c_exit = 0
 c_success = 0
 c_error = 0
-with open("1688_product_2023021.json", "r") as file_in:
+with open("1688_product_beam.json", "r") as file_in:
 #with open("1688_product_test.json", "r") as file_in:
     for line in file_in.readlines():
-        c_all += 1
-        try:
+#        c_all += 1
+#        try:
             product_json = json.loads(line)
             product_json = dict(product_json)
             if product_table.find_one({'item_id': product_json['itemId']}) == None: 
@@ -165,12 +165,12 @@ with open("1688_product_2023021.json", "r") as file_in:
                 )
                 store_data_in_mongodb(product_json, gpt_content_dict)
                 c_success += 1
-            else:
-                c_exit += 1
-        except Exception as e:
-            c_error += 1
-            print("error....%s"%e)
-        print("%d items processed: %d exist, %d success, %d error."%(c_all, c_exit, c_success, c_error))
+#            else:
+#                c_exit += 1
+#        except Exception as e:
+#            c_error += 1
+#            print("error....%s"%e)
+#        print("%d items processed: %d exist, %d success, %d error."%(c_all, c_exit, c_success, c_error))
 file_in.close()
 
 print("%d items process: %d exist, %d success, %d error."%(c_all, c_exit, c_success, c_error))
