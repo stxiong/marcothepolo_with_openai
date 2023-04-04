@@ -5,15 +5,16 @@ import os
 import time
 import pymongo
 
-openai.api_key = "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"
+openai.api_key = "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"
 OPENAI_GPT_MODEL = "text-davinci-003" 
 
 mongo_cli = pymongo.MongoClient("localhost", 27017)
-product_db = mongo_cli['1688_product']
-product_table = product_db['gpt_product_info_20230315']
+product_db = mongo_cli['1688_product_test']
+product_table = product_db['gpt_product_info_20230403']
 product_table.create_index([('item_id', pymongo.ASCENDING)], unique=True)
 
-origin_data_file = "1688_20230315/baitezy.json"
+#origin_data_file = "1688_20230315/baitezy.json"
+origin_data_file = "1688_test.json"
 
 
 def parse_specific_dict(item_specifies):
@@ -29,17 +30,17 @@ def parse_product(category, item_id, item_title, item_specifies):
     
     gpt_content_dict = {}
    
-    # 1.generate short product title in English
-    print("...#1.generate short product title in English")
+    # 1.generate short product title in Spanish
+    print("...#1.generate short product title in Spanish")
     response = openai.Completion.create(
       model=OPENAI_GPT_MODEL,
       prompt="this is some information of a %s product in json format, \
-        please help to genenrate a product title in english, \
-        the title should only include English words, \
+        please help to genenrate a product title in Spanish, \
+        the title should only include Spanish words, \
         and please notice that don't include any information \
-        about 'cross-border': %s %s"%(category, item_title, json.dumps(item_specifies)),
+        about 'cross-border': %s %s."%(category, item_title, json.dumps(item_specifies)),
       max_tokens=16,
-      temperature=1,
+      temperature=0.6,
       frequency_penalty=0.0,
       presence_penalty=0.0
     )
@@ -48,15 +49,15 @@ def parse_product(category, item_id, item_title, item_specifies):
     print(response.choices)
     print(response.usage)
     
-    # 2.generate long product title in English
-    print("...#2.generate long product title in English")
+    # 2.generate long product title in Spanish
+    print("...#2.generate long product title in Spanish")
     response = openai.Completion.create(
       model=OPENAI_GPT_MODEL,
       prompt="this is some information of a %s product in json format, \
-        please help to genenrate a product title in English, \
-        the title should only include English words, \
+        please help to genenrate a product title in Spanish, \
+        the title should only include Spanish words, \
         and please notice that don't include any information \
-        about 'cross-border': %s %s"%(category, item_title, json.dumps(item_specifies)),
+        about 'cross-border': %s %s."%(category, item_title, json.dumps(item_specifies)),
       max_tokens=64,
       temperature=1,
       frequency_penalty=0.0,
@@ -72,16 +73,16 @@ def parse_product(category, item_id, item_title, item_specifies):
     print ("the short title generate by GPT-3 is: %s"%gpt_content_dict['short_title'].strip())
     print ("the long title generate by GPT-3 is: %s"%gpt_content_dict['long_title'].strip())
     
-    # 3.extract item specifies in English
-    print("...#3.extract item specifies in English")
+    # 3.extract item specifies in Spanish
+    print("...#3.extract item specifies in Spanish")
     prompt = "this is specifies information of a %s product in key-value format, \
-        please translate to English: %s"%(category, json.dumps(item_specifies))
+        please translate to Spanish: %s."%(category, json.dumps(item_specifies))
     print(prompt)
     response = openai.Completion.create(
       model=OPENAI_GPT_MODEL,
       prompt=prompt,
       max_tokens=1024,
-      temperature=1,
+      temperature=0.1,
       frequency_penalty=0.0,
       presence_penalty=0.0)
     gpt_content_dict['item_specifies'] = response.choices[0]['text']
@@ -92,8 +93,8 @@ def parse_product(category, item_id, item_title, item_specifies):
     # 4. select import tags 
     print("...#4.select import tags")
     prompt = "this is some information of a %s product in json format \
-        , please extract no more than 10 most important tags for describing this online product in English \
-        : %s %s"%(category, item_title, json.dumps(item_specifies))
+        , please extract no more than 10 most important tags for describing this online product in Spanish \
+        : %s %s."%(category, item_title, json.dumps(item_specifies))
     print(prompt)
     response = openai.Completion.create(
       model=OPENAI_GPT_MODEL,
@@ -111,8 +112,8 @@ def parse_product(category, item_id, item_title, item_specifies):
     # 5. generate recommend essay
     print("...#5.generate recommend essay")
     prompt="this is some information of a %s product in json format, \
-        please help to generate a short recomend text in english, \
-        for online selling: %s %s"%(category, item_title, json.dumps(item_specifies))
+        please help to generate a short recomend text in Spanish, \
+        for online selling: %s %s."%(category, item_title, json.dumps(item_specifies))
     print(prompt)
     response = openai.Completion.create(
       model=OPENAI_GPT_MODEL,
@@ -130,13 +131,13 @@ def parse_product(category, item_id, item_title, item_specifies):
     gpt_content_dict['translated_item_specifics'] = [] 
     for k, v in item_specifies.items():
         prompt="this is specific for a %s product in key-value format, \
-            please help to translate to english %s:%s"%(category, k, v) 
+            please help to translate to Spanish: %s:%s."%(category, k, v) 
         print(prompt)
         response = openai.Completion.create(
           model=OPENAI_GPT_MODEL,
           prompt=prompt,
           max_tokens=64,
-          temperature=0.6,
+          temperature=0.1,
           frequency_penalty=0.0,
           presence_penalty=0.0
         )
