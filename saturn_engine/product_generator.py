@@ -34,21 +34,20 @@ class ProductContextGenerator(object):
         }
         
         #1. check JSON decode
-        try:
-            json_dict = json.loads(context)
+        try: json_dict = json.loads(context)
         except:
             check_result['valid'] = False
             check_result['info'] = "invalid JSON format"
             return check_result
 
         #2. check JSON keys
-        if not "short title" in json_dict.keys():
+        if not "short_title" in json_dict.keys():
             check_result['valid'] = False
-            check_result['info'] = "without key [short title]"
+            check_result['info'] = "without key [short_title]"
             return check_result
-        if not "product title" in json_dict.keys():
+        if not "product_title" in json_dict.keys():
             check_result['valid'] = False
-            check_result['info'] = "without key [product title]"
+            check_result['info'] = "without key [product_title]"
             return check_result
         if not "recommend" in json_dict.keys():
             check_result['valid'] = False
@@ -60,8 +59,8 @@ class ProductContextGenerator(object):
             return check_result
 
         #3. check language
-        # todo 
-
+        # not do this right now
+            
         return check_result
             
             
@@ -74,7 +73,7 @@ class ProductContextGenerator(object):
         prompt += ' and generate one short title for this item with no more than 45 charactors, '
         prompt += ' and also generate a recomend text for online selling with at less 5 sentences, ' 
         prompt += ' and extract no more than 10 most important tags for describing this online product in %s.'%language 
-        prompt += ' the output must be in strict JSON format: "short title": "the title you generate", "product title": "the title you generate", "recommend": "the recommend text you generate", "tags": "[important tags array you selected]". ' 
+        prompt += ' the output must be in strict JSON format: "short_title": "the title you generate", "product_title": "the title you generate", "recommend": "the recommend text you generate", "tags": "[important tags array you selected]". ' 
         prompt += ' the language of all the output values must be only %s, '%language
         prompt += ' and please notice that do not include any information about cross-border.'
         
